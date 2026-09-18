@@ -1,3 +1,9 @@
+## [2.10.1](https://github.com/aretecp/ms-365-mcp-server/compare/v2.10.0...v2.10.1) (2026-09-18)
+
+### Bug Fixes
+
+* use wait-for-healthy action instead of curling raw ([c998b61](https://github.com/aretecp/ms-365-mcp-server/commit/c998b6119efca1e7f2c7ce445344675e6bdca47e))
+
 ## [2.10.0](https://github.com/aretecp/ms-365-mcp-server/compare/v2.9.0...v2.10.0) (2026-09-01)
 
 ### New Features
