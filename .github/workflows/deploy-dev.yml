@@ -55,10 +55,14 @@ jobs:
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1
+        env:
+          EXPECTED_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
         with:
           host: ${{ env.VPS_TAILSCALE_IP }}
           username: ${{ vars.VPS_USER }}
           key: ${{ env.VPS_SSH_KEY }}
+          envs: EXPECTED_REPO,GH_TOKEN
           command_timeout: 15m
           script: |
             set -euo pipefail
@@ -72,7 +76,7 @@ jobs:
             # by project+service). See docker-compose.dev.yml.
             if [ ! -d "$REPO_DIR/.git" ]; then
               echo "Cloning ms-365-mcp-server into $REPO_DIR (first-time dev setup)..."
-              git clone https://github.com/aretecp/ms-365-mcp-server.git "$REPO_DIR"
+              git clone https://github.com/Lumist-Labs/ms-365-mcp-server.git "$REPO_DIR"
             fi
 
             cd "$REPO_DIR"
@@ -90,6 +94,37 @@ jobs:
             ENVIRONMENT=development
             ENVEOF
             chmod 600 .env.dev
+
+
+            # This checkout outlives an org move; its remote does not follow one,
+            # and this workflow does not use vps-deploy-core so it gets none of
+            # that action's protection. litellm-gateway's edge deploy — same
+            # hand-rolled shape — died on exactly this after its transfer:
+            # the redirect covers the web and `uses:`, not a private fetch, and
+            # a private repo answers 404 rather than 403 so it reads as a bad URL.
+            #
+            # github.com only, scheme preserved: a self-hosted remote must not be
+            # repointed at github.com, and a box on git@ has no https credential.
+            CUR_URL=$(git remote get-url origin 2>/dev/null || echo "")
+            case "$CUR_URL" in
+              https://github.com/*) NEW_URL="https://github.com/$EXPECTED_REPO.git" ;;
+              git@github.com:*)     NEW_URL="git@github.com:$EXPECTED_REPO.git" ;;
+              *)                    NEW_URL="" ;;
+            esac
+            if [ -n "$NEW_URL" ]; then
+              CUR_PATH=$(printf '%s' "$CUR_URL" | sed -E 's#^https://github\.com/##; s#^git@github\.com:##; s#\.git$##')
+              if [ "$(printf '%s' "$CUR_PATH" | tr 'A-Z' 'a-z')" != "$(printf '%s' "$EXPECTED_REPO" | tr 'A-Z' 'a-z')" ]; then
+                echo "origin is '$CUR_PATH' but this repo is '$EXPECTED_REPO' — repointing to $NEW_URL"
+                git remote set-url origin "$NEW_URL"
+              fi
+            fi
+
+            # The box's stored credential was made for the old org. Hand git the
+            # job token via GIT_CONFIG_* so nothing lands in .git/config and the
+            # helper reads $GH_TOKEN at exec time, keeping it off `ps`.
+            export GIT_CONFIG_COUNT=1
+            export GIT_CONFIG_KEY_0="credential.helper"
+            export GIT_CONFIG_VALUE_0='!f() { if test "$1" = get; then printf "username=x-access-token\npassword=%s\n" "$GH_TOKEN"; fi; }; f'
 
             git fetch origin
             git checkout "$BRANCH"
