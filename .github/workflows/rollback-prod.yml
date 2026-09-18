@@ -27,7 +27,7 @@ jobs:
       # handshake. /tailscale yields TAILSCALE_AUTHKEY, VPS_SSH_KEY and
       # VPS_TAILSCALE_IP uniquely, and matches vps-deploy-core's infra-path.
       - name: Load shared infra secrets from Infisical (OIDC)
-        uses: aretecp/github-actions/actions/load-infisical-secrets@v2
+        uses: Lumist-Labs/github-actions/actions/load-infisical-secrets@v2
         with:
           method: oidc
           identity-id: ${{ vars.INFISICAL_OIDC_IDENTITY_ID }}
@@ -37,7 +37,7 @@ jobs:
           recursive: true
 
       - name: Load app secrets from Infisical (OIDC)
-        uses: aretecp/github-actions/actions/load-infisical-secrets@v2
+        uses: Lumist-Labs/github-actions/actions/load-infisical-secrets@v2
         with:
           method: oidc
           identity-id: ${{ vars.INFISICAL_OIDC_IDENTITY_ID }}
@@ -46,7 +46,7 @@ jobs:
           path: /m365-mcp
 
       - name: Join Tailscale
-        uses: aretecp/github-actions/actions/tailscale-connect@v1
+        uses: Lumist-Labs/github-actions/actions/tailscale-connect@v1
         with:
           authkey: ${{ env.TAILSCALE_AUTHKEY }}
 
@@ -93,7 +93,7 @@ jobs:
       # had cd'd to the repo, so its relative compose path worked and ours would
       # not. They are only read for the log dump on timeout.
       - name: Wait for containers to become healthy
-        uses: aretecp/github-actions/actions/wait-for-healthy@v2
+        uses: Lumist-Labs/github-actions/actions/wait-for-healthy@v2
         with:
           host: ${{ env.VPS_TAILSCALE_IP }}
           username: ${{ vars.VPS_USER }}
