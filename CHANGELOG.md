@@ -1,3 +1,9 @@
+## [2.10.3](https://github.com/aretecp/ms-365-mcp-server/compare/v2.10.2...v2.10.3) (2026-09-18)
+
+### Bug Fixes
+
+* point shared workflows at Lumist-Labs ([#57](https://github.com/aretecp/ms-365-mcp-server/issues/57)) ([b9ade55](https://github.com/aretecp/ms-365-mcp-server/commit/b9ade555de0ed5447060c1e806917553e7c7215a))
+
 ## [2.10.2](https://github.com/aretecp/ms-365-mcp-server/compare/v2.10.1...v2.10.2) (2026-09-18)
 
 ### Bug Fixes
