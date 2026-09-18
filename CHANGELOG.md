@@ -1,3 +1,9 @@
+## [2.10.2](https://github.com/aretecp/ms-365-mcp-server/compare/v2.10.1...v2.10.2) (2026-09-18)
+
+### Bug Fixes
+
+* make the VPS checkout survive the org move ([7e13104](https://github.com/aretecp/ms-365-mcp-server/commit/7e13104947cdd49e429501b6544314376a47aa19))
+
 ## [2.10.1](https://github.com/aretecp/ms-365-mcp-server/compare/v2.10.0...v2.10.1) (2026-09-18)
 
 ### Bug Fixes
