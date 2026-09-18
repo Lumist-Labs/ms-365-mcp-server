@@ -1,6 +1,6 @@
 name: Release
 
-# Thin shim. Logic lives in aretecp/github-actions/.github/workflows/release-shared.yml.
+# Thin shim. Logic lives in Lumist-Labs/github-actions/.github/workflows/release-shared.yml.
 # Bump the @v2 ref there to pick up patch/minor fixes automatically.
 
 on:
@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   release:
-    uses: aretecp/github-actions/.github/workflows/release-shared.yml@v2
+    uses: Lumist-Labs/github-actions/.github/workflows/release-shared.yml@v2
     with:
       major: ${{ inputs.major || false }}
     secrets: inherit
