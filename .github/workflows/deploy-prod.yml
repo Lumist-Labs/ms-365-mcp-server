@@ -108,11 +108,18 @@ jobs:
             echo "Checked out: $(git rev-parse --short HEAD) ($(git log -1 --format=%s))"
 
             docker compose --env-file .env -f docker-compose.prod.yml up -d --build
+            echo "Containers up for $VERSION; health gate runs next."
 
-            curl -fsSL "https://raw.githubusercontent.com/aretecp/github-actions/v1/scripts/wait-for-healthy.sh" \
-              | TIMEOUT_SECONDS=150 \
-                COMPOSE_FILE=docker-compose.prod.yml \
-                ENV_FILE=.env \
-                LOG_TAIL=100 \
-                bash -s -- m365_mcp
-            echo "Deployed $VERSION."
+      # Own step, not a curl inside the block above: see ORG-MIGRATION.md H3.
+      # Paths are absolute because this is a fresh SSH session — the block above
+      # had cd'd to the repo, so its relative compose path worked and ours would
+      # not. They are only read for the log dump on timeout.
+      - name: Wait for containers to become healthy
+        uses: aretecp/github-actions/actions/wait-for-healthy@v2
+        with:
+          host: ${{ env.VPS_TAILSCALE_IP }}
+          username: ${{ vars.VPS_USER }}
+          key: ${{ env.VPS_SSH_KEY }}
+          containers: m365_mcp
+          compose-file: /home/${{ vars.VPS_USER }}/ms-365-mcp-server/docker-compose.prod.yml
+          env-file: /home/${{ vars.VPS_USER }}/ms-365-mcp-server/.env
